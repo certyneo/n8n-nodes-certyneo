@@ -1,0 +1,18 @@
+{
+	"node": "n8n-nodes-certyneo.certyneo",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Utility", "Productivity"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://github.com/dadekrahl/n8n-nodes-certyneo?tab=readme-ov-file#credentials"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://certyneo.com/en/integrations/n8n"
+			}
+		]
+	}
+}
