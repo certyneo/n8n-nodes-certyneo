@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.2
+
+- **The trigger now says what actually went wrong.** When Certyneo refuses a
+  webhook subscription, n8n used to surface "Bad request - please check your
+  parameters" — accurate about the status code, useless to the reader, and
+  misleading, since the parameters were fine. The real reason travels from
+  the API response to the message. The most common case, a URL that is not
+  reachable from the public internet, is named explicitly with the way out.
+- **The build no longer ships a partial package.** `n8n-node build` empties
+  `dist/` before compiling; with TypeScript incremental builds, only changed
+  sources were re-emitted, so `dist/` could be missing whole nodes while the
+  build reported success. Incremental is off, and a post-build check confronts
+  `dist/` with what `package.json` declares to n8n.
+
 ## 0.1.1
 
 - Contact address corrected to `support@certyneo.com`. The 0.1.0 metadata

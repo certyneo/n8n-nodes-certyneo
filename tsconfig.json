@@ -15,10 +15,12 @@
 		"preserveConstEnums": true,
 		"esModuleInterop": true,
 		"resolveJsonModule": true,
-		"incremental": true,
-		// Hors de dist/ : sinon l'artefact incrementiel (205 ko) part dans le
-		// paquet publie, ou il n'a rien a faire.
-		"tsBuildInfoFile": "./.tsbuildinfo",
+		// Desactive volontairement. `n8n-node build` vide dist/ avant de
+		// compiler ; avec incremental, TypeScript se fie a son fichier d'etat et
+		// ne reemet que les sources modifiees, produisant un dist/ ampute sans
+		// que rien ne le signale. Le paquet 0.1.2 construit ainsi ne contenait
+		// que le declencheur. Le build complet prend quelques secondes.
+		"incremental": false,
 		"declaration": true,
 		"sourceMap": true,
 		"skipLibCheck": true,

@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-certyneo",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "n8n community node for Certyneo — eIDAS-compliant electronic signatures. Send documents to sign, follow envelopes, and trigger workflows on signature events.",
   "license": "MIT",
   "homepage": "https://certyneo.com/en/integrations/n8n",
@@ -34,7 +34,8 @@
     "lint": "n8n-node lint",
     "lint:fix": "n8n-node lint --fix",
     "release": "n8n-node release",
-    "prepublishOnly": "n8n-node prerelease"
+    "prepublishOnly": "n8n-node prerelease",
+    "postbuild": "node scripts/verify-dist.mjs"
   },
   "publishConfig": {
     "access": "public"

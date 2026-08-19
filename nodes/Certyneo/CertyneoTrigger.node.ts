@@ -1,5 +1,6 @@
 import {
 	NodeConnectionTypes,
+	NodeOperationError,
 	type IDataObject,
 	type IHookFunctions,
 	type INodeType,
@@ -19,6 +20,61 @@ import { CERTYNEO_BASE_URL } from './Certyneo.node';
  * The subscription is created when the workflow is activated and deleted
  * when it is deactivated, which is n8n's contract for webhook triggers.
  */
+/**
+ * Turns a failed subscription into something the person reading it can act on.
+ *
+ * Certyneo answers 400 with `{ error: "URL rejected: ..." }` when the webhook
+ * URL is not reachable from the public internet — which is what happens on
+ * every localhost instance, because the API refuses private addresses on
+ * purpose. n8n on its own surfaces "Bad request - please check your
+ * parameters": accurate about the status code, useless to the reader, and
+ * misleading — it points at the parameters, which are fine.
+ *
+ * So the reason travels from the API response to the message. The
+ * unreachable-URL case gets named explicitly with the way out, because it is
+ * the one people hit first and the one they cannot diagnose from the outside.
+ */
+function subscriptionError(
+	context: IHookFunctions,
+	error: unknown,
+	webhookUrl: string | undefined,
+): NodeOperationError {
+	const body = (error as { cause?: { error?: unknown }; response?: { body?: unknown } })
+		?.cause?.error;
+	const apiMessage =
+		typeof body === 'string'
+			? body
+			: typeof (body as { error?: string })?.error === 'string'
+				? (body as { error: string }).error
+				: ((error as Error)?.message ?? '');
+
+	if (/url rejected/i.test(apiMessage) || /url rejected/i.test(String(error))) {
+		return new NodeOperationError(
+			context.getNode(),
+			'Certyneo cannot reach this n8n instance',
+			{
+				description:
+					`Certyneo refused to send events to ${webhookUrl ?? "this workflow's webhook URL"} because ` +
+					'that address is not ' +
+					'reachable from the public internet. A localhost or private URL is rejected on ' +
+					'purpose. Run this workflow on an instance with a public HTTPS address — n8n ' +
+					'Cloud, a tunnel, or your own deployment — then activate it again.',
+			},
+		);
+	}
+
+	return new NodeOperationError(
+		context.getNode(),
+		'Certyneo refused the webhook subscription',
+		{
+			description:
+				apiMessage ||
+				'The Certyneo API rejected the subscription without giving a reason. Check that ' +
+					'your API key carries the webhooks:write scope.',
+		},
+	);
+}
+
 export class CertyneoTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Certyneo Trigger',
@@ -151,16 +207,23 @@ export class CertyneoTrigger implements INodeType {
 				const webhookUrl = this.getNodeWebhookUrl('default');
 				const events = this.getNodeParameter('events') as string[];
 
-				const response = (await this.helpers.httpRequestWithAuthentication.call(
-					this,
-					'certyneoApi',
-					{
-						method: 'POST',
-						url: `${CERTYNEO_BASE_URL}/webhooks`,
-						body: { url: webhookUrl, events },
-						json: true,
-					},
-				)) as { id?: string; secret?: string };
+				let response: { id?: string; secret?: string };
+				try {
+					response = (await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'certyneoApi',
+						{
+							method: 'POST',
+							url: `${CERTYNEO_BASE_URL}/webhooks`,
+							body: { url: webhookUrl, events },
+							json: true,
+						},
+					)) as { id?: string; secret?: string };
+				} catch (error) {
+					// Rethrown, never swallowed: a subscription that silently fails to
+					// register leaves a workflow that looks active and never fires.
+					throw subscriptionError(this, error, webhookUrl);
+				}
 
 				if (response.id === undefined) return false;
 
