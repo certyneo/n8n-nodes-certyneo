@@ -16,6 +16,9 @@
 		"esModuleInterop": true,
 		"resolveJsonModule": true,
 		"incremental": true,
+		// Hors de dist/ : sinon l'artefact incrementiel (205 ko) part dans le
+		// paquet publie, ou il n'a rien a faire.
+		"tsBuildInfoFile": "./.tsbuildinfo",
 		"declaration": true,
 		"sourceMap": true,
 		"skipLibCheck": true,
