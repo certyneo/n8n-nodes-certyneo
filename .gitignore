@@ -1,2 +1,6 @@
 dist
 node_modules
+
+# Artefact de compilation incrementielle et tarballs locaux.
+.tsbuildinfo
+*.tgz
