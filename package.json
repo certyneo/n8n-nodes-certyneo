@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-certyneo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "n8n community node for Certyneo — eIDAS-compliant electronic signatures. Send documents to sign, follow envelopes, and trigger workflows on signature events.",
   "license": "MIT",
   "homepage": "https://certyneo.com/en/integrations/n8n",
@@ -15,7 +15,7 @@
   ],
   "author": {
     "name": "Certyneo",
-    "email": "api-support@certyneo.com"
+    "email": "support@certyneo.com"
   },
   "repository": {
     "type": "git",

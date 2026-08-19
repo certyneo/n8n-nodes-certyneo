@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+- Contact address corrected to `support@certyneo.com`. The 0.1.0 metadata
+  pointed at `api-support@certyneo.com`, a mailbox nobody reads — which also
+  meant n8n's ownership-verification token was sent into a void.
+
 ## 0.1.0
 
 First release.
