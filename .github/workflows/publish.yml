@@ -20,7 +20,7 @@
 # This package uses OIDC Trusted Publishing: npm trusts this exact repository
 # and this exact workflow filename, so no long-lived secret exists anywhere in
 # the repo settings. The trust is declared on npmjs.com under the package's
-# Settings → Trusted Publisher (owner "dadekrahl", repo "n8n-nodes-certyneo",
+# Settings → Trusted Publisher (owner "certyneo", repo "n8n-nodes-certyneo",
 # workflow "publish.yml", no environment).
 #
 # Renaming this file, moving the repository, or renaming the owner breaks the

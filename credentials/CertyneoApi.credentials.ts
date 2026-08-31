@@ -28,7 +28,7 @@ export class CertyneoApi implements ICredentialType {
 	};
 
 	documentationUrl =
-		'https://github.com/dadekrahl/n8n-nodes-certyneo?tab=readme-ov-file#credentials';
+		'https://github.com/certyneo/n8n-nodes-certyneo?tab=readme-ov-file#credentials';
 
 	properties: INodeProperties[] = [
 		{
