@@ -1,10 +1,10 @@
 /**
- * Exerce le chemin d'erreur du declencheur avec le refus REEL de l'API.
+ * Exercises the trigger's error path with the REAL API refusal.
  *
- * Le message « Bad request - please check your parameters » etait ce que n8n
- * affichait avant le correctif. On rejoue ici l'echec exact observe en
- * conditions reelles (400, corps `{ error: "URL rejected: ..." }`) et on
- * verifie ce que le noeud remonte desormais.
+ * The message "Bad request - please check your parameters" was what n8n
+ * used to show before the fix. Here we replay the exact failure observed
+ * in real conditions (400, body `{ error: "URL rejected: ..." }`) and
+ * check what the node now surfaces.
  */
 const { CertyneoTrigger } = require('./dist/nodes/Certyneo/CertyneoTrigger.node.js');
 
@@ -26,7 +26,7 @@ function contextThrowing(error) {
 	};
 }
 
-// Ce que n8n leve quand l'API repond 400 avec un corps JSON.
+// What n8n throws when the API responds 400 with a JSON body.
 const ssrfRefusal = Object.assign(
 	new Error('Request failed with status code 400'),
 	{ cause: { error: { error: 'URL rejected: private or loopback address' } } },
@@ -42,7 +42,7 @@ async function run(label, error) {
 	const ctx = contextThrowing(error);
 	try {
 		await trigger.webhookMethods.default.create.call(ctx);
-		console.log(`${label}: AUCUNE ERREUR LEVEE — le correctif ne mord pas`);
+		console.log(`${label}: NO ERROR THROWN — the fix isn't biting`);
 		return false;
 	} catch (e) {
 		console.log(`\n--- ${label} ---`);
@@ -51,14 +51,14 @@ async function run(label, error) {
 		const leaksRaw = /please check your parameters|status code 400/i.test(
 			`${e.message} ${e.description ?? ''}`,
 		);
-		console.log('fuite du message brut :', leaksRaw ? 'OUI (mauvais)' : 'non');
+		console.log('raw message leaked:', leaksRaw ? 'YES (bad)' : 'no');
 		return !leaksRaw;
 	}
 }
 
 (async () => {
-	const a = await run('URL non joignable (garde anti-SSRF)', ssrfRefusal);
-	const b = await run('Portee insuffisante', scopeRefusal);
-	console.log('\nresultat :', a && b ? 'OK' : 'ECHEC');
+	const a = await run('Unreachable URL (anti-SSRF guard)', ssrfRefusal);
+	const b = await run('Insufficient scope', scopeRefusal);
+	console.log('\nresult:', a && b ? 'OK' : 'FAILED');
 	process.exit(a && b ? 0 : 1);
 })();
